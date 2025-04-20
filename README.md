@@ -114,9 +114,10 @@ E_0 = -2 \times L^2
 <!-- ![alt text](image/show_ground_state.png)
 ![alt text](image/show_ground_state_1.png)
 ![alt text](image/show_ground_state_2.png) -->
-![alt text](image/show_ground_state_fancyarrow_1.png)
-![alt text](image/show_ground_state_fancyarrow_3.png)
-![alt text](image/show_ground_state_fancyarrow_2.png)
+<img src='image/show_ground_state_fancyarrow_1.png' width='500'>
+<img src='image/show_ground_state_fancyarrow_3.png' width='500'>
+<img src='image/show_ground_state_fancyarrow_2.png' width='500'>
+
 不难看出，以上三个基态:
 1. **均满足问题一中发现的规律**：
 >**构型规则总结：**  
@@ -209,8 +210,8 @@ $$
 
 哈密顿量中采用了反铁磁耦合项（\( J=1 > 0 \)），即相邻自旋倾向于反向排列。因此：
 
-- 相邻的 A–B 子格之间的自旋倾向相反，使得 \( C^{AB}(\mathbf{r} = 0) < 0 \)
-- 同类子格（A–A 或 B–B）在相距偶数格时可能存在间接反相关，造成 \( C^{AA}(\mathbf{r}) \)、\( C^{BB}(\mathbf{r}) \) 的负值和周期振荡
+- 相邻的 A–B 子格之间的自旋倾向相同，使得 \( C^{AB}(\mathbf{r} = 0) > 0 \)
+- 同类子格（A–A 或 B–B）的相邻格点自旋相反，使得 \( C^{AA}(\mathbf{r}) \) 和 \( C^{BB}(\mathbf{r}) \) 为负值，这样造成了**周期性**，即相距为偶数的关联函数更低，相距为奇数的关联函数更高。同时这也能解释**对角线相趋同**的原因。
 
 
 ### 2. **局域构型规则限制了自旋排列**
@@ -246,7 +247,7 @@ $$
 > 这些现象不仅揭示了基态的有序性，也体现了自旋系统中「简并约束」与「耦合竞争」之间的微妙平衡。
 
 
-
+---
 ## 附录
 ### 求解基态
 
@@ -276,7 +277,6 @@ def ising_monte_carlo(N:int,step:int)->np.ndarray:
         w = calculate_change_possibility(energy_change)
         if np.random.rand() < w:
             system[type_gedian, i, j] *= -1
-            energy = energy_final(system,N)
     return system
 
 
@@ -492,6 +492,52 @@ def compute_correlation(spin: np.ndarray, N: int, mu: int, nu: int) -> np.ndarra
     return correlation / count
 
 
+def compute_correlation_average(num:int,N:int, mu: int, nu: int,steps:int) -> np.ndarray:
+    corralation_average = correlation = np.zeros((N, N))
+    for i in range(num):
+        spin =  ising_monte_carlo(N, steps)
+        correlation = np.zeros((N, N))
+        count = np.zeros((N, N))  # 用于记录每个位移的统计次数
+
+        for i in range(N):
+            for j in range(N):
+                s1 = spin[mu, i, j]
+                for dx in range(N):
+                    for dy in range(N):
+                        ni = (i + dx) % N
+                        nj = (j + dy) % N
+                        s2 = spin[nu, ni, nj]
+                        correlation[dx, dy] += s1 * s2
+                        count[dx, dy] += 1
+        corralation_average +=correlation/ count
+
+    return corralation_average/num
+
+
+def plot_correlation_matrix_average( N: int,num:int,steps:int):
+    """
+    可视化四种关联函数的热力图
+    """
+    labels = ['A', 'B']
+    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+    
+    for i, mu in enumerate([0, 1]):
+        for j, nu in enumerate([0, 1]):
+            corr = np.zeros((N,N))
+            for _ in range(num):
+                corr += compute_correlation_average(num,N,mu,nu,steps)
+            corr=corr/num
+
+            ax = axs[i][j]
+            im = ax.imshow(corr, cmap='coolwarm', origin='lower')
+            ax.set_title(f'C^{labels[mu]}{labels[nu]}(r)', fontsize=14)
+            plt.colorbar(im, ax=ax)
+    
+    plt.tight_layout()
+    plt.savefig(f'./image/correlation_heatmap_average_size={N}.png')
+    plt.close()
+
+
 def plot_correlation_matrix(spin: np.ndarray, N: int,num:int):
     """
     可视化四种关联函数的热力图
@@ -520,11 +566,11 @@ def plot_correlation_matrix(spin: np.ndarray, N: int,num:int):
 if __name__ == "__main__":
     N = 8
     J = 1.0
-    steps = 10000
-    num = 10
+    steps = 5000
+    num = 80
     # spin_average = np.zeros((2,N,N))
     # for i in range(num):
-    spins = ising_monte_carlo(N, steps)
+    # spins = ising_monte_carlo(N, steps)
     #     spin_average += spins
     # spin_average=spin_average/num
 
@@ -537,5 +583,6 @@ if __name__ == "__main__":
     #     ])
 
     # visualize_spin(spin_average,N)
-    plot_correlation_matrix(spins, N,num)
+    plot_correlation_matrix_average( N,num,steps)
+
 ```
