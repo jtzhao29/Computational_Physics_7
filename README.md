@@ -114,9 +114,9 @@ E_0 = -2 \times L^2
 <!-- ![alt text](image/show_ground_state.png)
 ![alt text](image/show_ground_state_1.png)
 ![alt text](image/show_ground_state_2.png) -->
-<img src='image/show_ground_state_fancyarrow_1.png' width='500'>
-<img src='image/show_ground_state_fancyarrow_3.png' width='500'>
-<img src='image/show_ground_state_fancyarrow_2.png' width='500'>
+<img src='image/show_ground_state_fancyarrow_1.png'>
+<img src='image/show_ground_state_fancyarrow_3.png' >
+<img src='image/show_ground_state_fancyarrow_2.png' >
 
 不难看出，以上三个基态:
 1. **均满足问题一中发现的规律**：
@@ -146,6 +146,10 @@ $$
 我们分别绘制了四种组合的关联函数热力图 \(C^{AA}(r)\), \(C^{AB}(r)\), \(C^{BA}(r)\), \(C^{BB}(r)\)。如下图所示：
 
 ![correlation_heatmap](./image/correlation_heatmap_average_size=8.png)
+
+为了防止偶然性，取N=20，得到相关函数的热力图如下：
+
+![correlation_heatmap](./image/correlation_heatmap_average_size=20.png)
 
 ### 发现的规律
 
@@ -210,8 +214,13 @@ $$
 
 哈密顿量中采用了反铁磁耦合项（\( J=1 > 0 \)），即相邻自旋倾向于反向排列。因此：
 
-- 相邻的 A–B 子格之间的自旋倾向相同，使得 \( C^{AB}(\mathbf{r} = 0) > 0 \)
+- 相邻的 A–B 子格之间的自旋倾向相反，使得 \( C^{AB}(\mathbf{r} = 0) < 0 \)
+- 沿着直接相邻的格点方向(A-B,B-A)自旋相关性比较强，关联函数表现出明显的负值，当距离较远时相关性减弱，绝对值趋于0
 - 同类子格（A–A 或 B–B）的相邻格点自旋相反，使得 \( C^{AA}(\mathbf{r}) \) 和 \( C^{BB}(\mathbf{r}) \) 为负值，这样造成了**周期性**，即相距为偶数的关联函数更低，相距为奇数的关联函数更高。同时这也能解释**对角线相趋同**的原因。
+- 在当前模型中，由于晶格是方形的且耦合各向同性(J 在所有方向相同),关联函数的衰减在 x 和 y 方向应是对称的。如果存在各向异性(如不同方向的 J 不同),热力图中特定方向的关联强度可能更突出。
+- 同子格自旋间直接相互作用相比异子格较弱(模型定义中仅 A-B 子格耦合),因此同
+子格关联主要由间接效应(如多体相互作用)贡献，通常较弱。而异子格关联直接由
+反铁磁耦合主导。
 
 
 ### 2. **局域构型规则限制了自旋排列**
